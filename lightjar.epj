@@ -2,7 +2,7 @@
   "header": {
     "comment": "eric project file for project lightjar",
     "copyright": "Copyright (C) 2024 , ",
-    "saved": "2024-11-30, 13:40:03"
+    "saved": "2024-12-02, 21:00:25"
   },
   "project": {
     "AUTHOR": "",
@@ -73,7 +73,9 @@
     "RESOURCES": [],
     "SOURCES": [
       "__init__.py",
-      "main.py"
+      "main.py",
+      "palettes.py",
+      "simulator.py"
     ],
     "SOURCESDIR": "",
     "SPELLEXCLUDES": "",

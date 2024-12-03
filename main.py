@@ -4,7 +4,10 @@ import neopixel
 from machine import Pin
 import random
 import time
-import palettes
+from palettes import ColorDict
+
+color_dict = ColorDict.get_colordict()
+color_names = ColorDict.get_colornames()
 
 p = Pin(5, Pin.OUT)
 ind_led = Pin(25, Pin.OUT)
@@ -19,20 +22,27 @@ reset_leds()
 
 time_delay = 0.001
 
-def hex_to_rgb(hex_str):
-    hex_str = hex_str.replace('#', '')
-    return (int(hex_str[0:2],16), int(hex_str[2:4],16), int(hex_str[4:6],16))
+def interpolate_colors(start, end, steps):
+    start_color = (start[0]/256, start[1]/256, start[2]/256)
+    end_color = (end[0]/256, end[1]/256, end[2]/256)
 
-cool_colors1 = [hex_to_rgb(x) for x in [
-    '#0d4682',
-    '#275892',
-    '#3f68a1',
-    '#5878b0',
-    '#7089be',
-    '#8899cd',
-    '#a1aadc',
-    '#b9baeb'
-]]
+    red_diff = end_color[0] - start_color[0]
+    green_diff = end_color[1] - start_color[1]
+    blue_diff = end_color[2] - start_color[2]
+
+    red_delta = red_diff/steps
+    green_delta = green_diff/steps
+    blue_delta = blue_diff/steps
+
+    return_gradient = []
+    for step in range(0, steps):
+        interp_color = (
+            int((start_color[0] + (red_delta*step))*256),
+            int((start_color[1] + (green_delta*step))*256),
+            int((start_color[2] + (blue_delta*step))*256),
+            )
+        return_gradient.append(interp_color)
+    return return_gradient
 
 # Remap LEDs to handle alternating direction
 def remap_leds(neo_led_obj):
