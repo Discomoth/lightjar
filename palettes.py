@@ -1,9 +1,38 @@
 # -*- coding: utf-8 -*-
 # colors.py
 
+palette_names = ['inferno', 'plasma', 'turbo', 'Blues', 'Purples', 'Reds', 'Spectral', 'autumn', 'cool', 'coolwarm', 'ocean', 'prism', 'rainbow', 'spring', 'summer', 'terrain', 'winter']
+
+
 def hex_to_rgb(hex_str):
     hex_str = hex_str.replace('#', '')
     return (int(hex_str[0:2],16), int(hex_str[2:4],16), int(hex_str[4:6],16))
 
-gradient_1 = [hex_to_rgb(color) for color in ["F83D5C","F83D5A","F83E59","F93E57","F93F56","F93F54","F94053","F94051","F94150","FA414E","FA424C","FA424B","FA4349","FA4348","FA4446","FB4445","FB4543","FB4542","FB4640","FB463F","FB473D","FC473B","FC483A","FC4838","FC4937","FC4935","FC4A34","FD4A32","FD4B31","FD4B2F"]]
-gradient_2 = [hex_to_rgb(color) for color in ["3EC9F7","3FC2F7","3FBBF8","40B4F8","41ADF8","41A6F8","429FF9","4398F9","4392F9","448BF9","4584FA","457DFA","4676FA","476FFB","4768FB","4861FB","485AFB","4953FC","4A4CFC","4A45FC","4B3EFD","4C37FD","4C31FD","4D2AFD","4E23FE","4E1CFE","4F15FE","500EFE","5007FF","5100FF"]]
+#Matplotlib color gradients
+class ColorDict:
+
+    @staticmethod
+    def get_colornames():
+        return palette_names
+
+    @staticmethod
+    def get_colordict():
+        color_dict = {"inferno":[hex_to_rgb(color) for color in ['#000004', '#fcffa4']],
+            "plasma":[hex_to_rgb(color) for color in ['#0d0887', '#f0f921']],
+            "turbo":[hex_to_rgb(color) for color in ['#30123b', '#7a0403']],
+            "Blues":[hex_to_rgb(color) for color in ['#f7fbff', '#08306b']],
+            "Purples":[hex_to_rgb(color) for color in ['#fcfbfd', '#3f007d']],
+            "Reds":[hex_to_rgb(color) for color in ['#fff5f0', '#67000d']],
+            "Spectral":[hex_to_rgb(color) for color in ['#9e0142', '#5e4fa2']],
+            "autumn":[hex_to_rgb(color) for color in ['#ff0000', '#ffff00']],
+            "cool":[hex_to_rgb(color) for color in ['#00ffff', '#ff00ff']],
+            "coolwarm":[hex_to_rgb(color) for color in ['#3b4cc0', '#b40426']],
+            "ocean":[hex_to_rgb(color) for color in ['#008000', '#ffffff']],
+            "prism":[hex_to_rgb(color) for color in ['#ff0000', '#54ff00']],
+            "rainbow":[hex_to_rgb(color) for color in ['#8000ff', '#ff0000']],
+            "spring":[hex_to_rgb(color) for color in ['#ff00ff', '#ffff00']],
+            "summer":[hex_to_rgb(color) for color in ['#008066', '#ffff66']],
+            "terrain":[hex_to_rgb(color) for color in ['#333399', '#ffffff']],
+            "winter":[hex_to_rgb(color) for color in ['#0000ff', '#00ff80']],
+        }
+        return color_dict
