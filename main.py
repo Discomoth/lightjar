@@ -11,6 +11,28 @@ n = neopixel.NeoPixel(p, led_count, timing=1)
 
 time_delay = 0.001
 
+# Remap LEDs to handle alternating direction
+def remap_leds(neo_led_obj):
+    final_list = []
+    temp_list = []
+    reverse = True
+    for led in range(len(neo_led_obj)):
+        temp_list.append(led)
+
+        if (led+1) % 8 == 0 and reverse:
+            temp_list.reverse()
+            final_list.extend(temp_list)
+            temp_list = []
+            reverse = False
+
+        elif (led+1) % 8 == 0 and not reverse:
+            final_list.extend(temp_list)
+            temp_list = []
+            reverse = True
+
+    return final_list
+
+n.n_r = remap_leds(n)
 # Mode 1
 
 while True:
