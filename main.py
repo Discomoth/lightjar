@@ -11,6 +11,20 @@ n = neopixel.NeoPixel(p, led_count, timing=1)
 
 time_delay = 0.001
 
+def hex_to_rgb(hex_str):
+    hex_str = hex_str.replace('#', '')
+    return (int(hex_str[0:2],16), int(hex_str[2:4],16), int(hex_str[4:6],16))
+
+cool_colors1 = [hex_to_rgb(x) for x in [
+    '#0d4682',
+    '#275892',
+    '#3f68a1',
+    '#5878b0',
+    '#7089be',
+    '#8899cd',
+    '#a1aadc',
+    '#b9baeb'
+]]
 # Remap LEDs to handle alternating direction
 def remap_leds(neo_led_obj):
     final_list = []
