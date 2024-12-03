@@ -2,7 +2,9 @@
 # main.py
 import neopixel
 from machine import Pin
+import random
 import time
+import palettes
 
 p = Pin(5, Pin.OUT)
 ind_led = Pin(25, Pin.OUT)
