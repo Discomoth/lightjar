@@ -151,13 +151,13 @@ def sweeping_colors():
             for column in led_columns:
                 n[column[led]] = color
             n.write()
-            time.sleep(0.05)
+            time.sleep(0.005)
     for color in colors_rev:
         for led in range(8):
             for column in led_columns:
                 n[column[led]] = color
             n.write()
-            time.sleep(0.05)
+            time.sleep(0.005)
     
 
 # Sequence Functions
