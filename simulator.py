@@ -1,26 +1,37 @@
 import pygame
 import time
 import random
+from palettes import ColorDict
+
+color_dict = ColorDict.get_colordict()
+color_names = ColorDict.get_colornames()
 
 pygame.init()
 screen = pygame.display.set_mode((900, 500))
 clock = pygame.time.Clock()
 running = True
 
-def hex_to_rgb(hex_str):
-	hex_str = hex_str.replace('#', '')
-	return (int(hex_str[0:2],16), int(hex_str[2:4],16), int(hex_str[4:6],16))
+def interpolate_colors(start, end, steps):
+    start_color = (start[0]/256, start[1]/256, start[2]/256)
+    end_color = (end[0]/256, end[1]/256, end[2]/256)
 
-cool_colors1 = [hex_to_rgb(x) for x in [
-	'#0d4682',
-	'#275892',
-	'#3f68a1',
-	'#5878b0',
-	'#7089be',
-	'#8899cd',
-	'#a1aadc',
-	'#b9baeb'
-]]
+    red_diff = end_color[0] - start_color[0]
+    green_diff = end_color[1] - start_color[1]
+    blue_diff = end_color[2] - start_color[2]
+
+    red_delta = red_diff/steps
+    green_delta = green_diff/steps
+    blue_delta = blue_diff/steps
+
+    return_gradient = []
+    for step in range(0, steps):
+        interp_color = (
+            int((start_color[0] + (red_delta*step))*256),
+            int((start_color[1] + (green_delta*step))*256),
+            int((start_color[2] + (blue_delta*step))*256),
+            )
+        return_gradient.append(interp_color)
+    return return_gradient
 
 def remap_leds(neo_led_obj):
     final_list = []
@@ -100,32 +111,6 @@ def test_sequence2():
 			time.sleep(0.005)
 			n.write()
 
-def test_sequence3():
-    color_list = cool_colors1
-    for _ in range(len(color_list)):
-        for pos, led in enumerate(n.n_r):
-            if pos == 0 or pos == 8:
-                n[led] = color_list[0]
-            elif pos == 1 or pos == 9:
-                n[led] = color_list[1]
-            elif pos == 2 or pos == 10:
-                n[led] = color_list[2]
-            elif pos == 3 or pos == 11:
-                n[led] = color_list[3]
-            elif pos == 4 or pos == 12:
-                n[led] = color_list[4]
-            elif pos == 5 or pos == 13:
-                n[led] = color_list[5]
-            elif pos == 6 or pos == 14:
-                n[led] = color_list[6]
-            elif pos == 7 or pos == 15:
-                n[led] = color_list[7]
-        
-        n.write()
-        color_list = [color_list[pos-1] for pos in range(len(color_list))]
-
-        time.sleep(0.25)
-
 def color_rain():
 	rain_gradient_map = [
 		[1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
@@ -171,13 +156,43 @@ def color_rain():
 		time.sleep(0.01)
 	time.sleep(random.randrange(0, 100)/100)
 
+def sweeping_colors():
+    
+    random_color = color_names[random.randrange(0, len(color_names))]
+    print(random_color)
+    colors = interpolate_colors(color_dict[random_color][0],color_dict[random_color][1],256)
+    colors_rev = [x for x in colors]
+    colors_rev.reverse()
+    
+    leds = [x for x in n.n_r]
+    led_columns = []
+    for column in range(6):
+        col_list = []
+        for row in range(8):
+            col_list.append(leds.pop(0))
+        led_columns.append(col_list)
+        
+    for color in colors:
+        for led in range(8):
+            for column in led_columns:
+                n[column[led]] = color
+            n.write()
+            time.sleep(0.0001)
+    for color in colors_rev:
+        for led in range(8):
+            for column in led_columns:
+                n[column[led]] = color
+            n.write()
+            time.sleep(0.0001)
+    
+
 while running:
 
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			running = False
 
-	color_rain()
+	sweeping_colors()
 
 	clock.tick(60)
 
