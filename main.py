@@ -9,6 +9,11 @@ ind_led = Pin(25, Pin.OUT)
 led_count = 48
 n = neopixel.NeoPixel(p, led_count, timing=1)
 
+def reset_leds():
+    for index in range(len(n)):
+        n[index] = (0,0,0)
+
+reset_leds()
 time_delay = 0.001
 
 def hex_to_rgb(hex_str):
