@@ -132,8 +132,10 @@ def test_seq_1():
         
 def sweeping_colors():
     
-    colors = [x for x in palettes.gradient_2]
-    colors_rev = [x for x in palettes.gradient_2]
+    random_color = color_names[random.randrange(0, len(color_names))]
+    print(random_color)
+    colors = interpolate_colors(color_dict[random_color][0],color_dict[random_color][1],256)
+    colors_rev = [x for x in colors]
     colors_rev.reverse()
     
     leds = [x for x in n.n_r]
