@@ -97,6 +97,16 @@ class NeoPixel:
 
 n = NeoPixel(48, screen)
 
+# Establish columns
+leds = [x for x in n.n_r]
+led_columns = []
+for column in range(6):
+    col_list = []
+    for row in range(8):
+        col_list.append(leds.pop(0))
+    led_columns.append(col_list)
+del leds
+
 def test_sequence():
 	for led in n.n_r:
 		n[led-1] = (0,0,0)
@@ -185,14 +195,53 @@ def sweeping_colors():
             n.write()
             time.sleep(0.0001)
     
+def ocean_waves():
+
+	color_fwd= interpolate_colors(color_dict['ocean'][0], color_dict['ocean'][1], 16)
+	color_rev = interpolate_colors(color_dict['ocean'][1], color_dict['ocean'][0], 16)
+	color = []
+	for step in range(2):
+			color.extend(color_fwd)
+			color.extend(color_rev)
+
+	color.extend(color_rev)
+	colorpos = 0
+	reset = False
+	for _ in range(8):
+		for iterator in range(8):
+			if not reset:
+				colorpos += 1
+			else:
+				colorpos -= 1
+
+
+			if colorpos == 0:
+				reset = False
+			elif colorpos == 64:
+				reset = False
+
+			for column in led_columns:
+				for pos, led in enumerate(column[::iterator+2]):
+					n[led] = (
+						color[colorpos][0],
+						color[colorpos][1],
+						color[colorpos][2])
+					n.write()
+			for column in led_columns:
+				for pos, led in enumerate(column[1::iterator+2]):
+					n[led] = (
+						color[colorpos][0],
+						color[colorpos][1],
+						color[colorpos][2])
+					n.write()
+
 
 while running:
-
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			running = False
 
-	sweeping_colors()
+	ocean_waves()
 
 	clock.tick(60)
 
