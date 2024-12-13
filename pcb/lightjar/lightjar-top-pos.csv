@@ -1,0 +1,21 @@
+Designator,Val,Package,MidX,MidY,Rotation,Layer
+C1,10 uF,R_1206_3216Metric_Pad1.30x1.75mm_HandSolder,161.9,-45,-90,top
+C2,10 uF,R_1206_3216Metric_Pad1.30x1.75mm_HandSolder,155,-46.5,180,top
+C3,10 uF,R_1206_3216Metric_Pad1.30x1.75mm_HandSolder,162.725,-61.45,-90,top
+C4,10 uF,R_1206_3216Metric_Pad1.30x1.75mm_HandSolder,163.013379,-67.993253,90,top
+D1,D_Schottky,D_SOD-123,161.902913,-38.845158,90,top
+D2,D_Schottky,D_SOD-123,150,-126,-90,top
+F1,1.5A SMD Fuse,R_1206_3216Metric_Pad1.30x1.75mm_HandSolder,168.5,-43.5,0,top
+J1,Power/Comms,"TerminalBlock_Phoenix_PT-1,5-6-3.5-H_1x06_P3.50mm_Horizontal",169.799443,-65.030275,90,top
+J2,Button,"TerminalBlock_Phoenix_PT-1,5-2-3.5-H_1x02_P3.50mm_Horizontal",156,-70.25,-90,top
+J3,Photoresistor,"TerminalBlock_Phoenix_PT-1,5-2-3.5-H_1x02_P3.50mm_Horizontal",169.8,-73.75,90,top
+J4,Potentiometer,"TerminalBlock_Phoenix_PT-1,5-3-3.5-H_1x03_P3.50mm_Horizontal",156,-58,-90,top
+Q1,MMBTA42,SOT-23,158.3375,-52.5,180,top
+R1,10k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,161,-74,-90,top
+R2,1k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,165,-70.6625,-90,top
+R3,1k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,160.725,-61.45,-90,top
+R4,20k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,163.5,-74,90,top
+R5,20k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,162,-51.5,0,top
+R6,220,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,162,-53.5,0,top
+U1,AMS1117-5.0,SOT-223-3_TabPin2,156.7,-40.35,90,top
+U2,Pico,RPi_Pico_SMD_TH,163.11,-102.89,180,top
