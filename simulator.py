@@ -319,6 +319,27 @@ def cycle():
         n.write()
         time.sleep(0.01)
 
+
+def rotator():
+    global current_palette
+    global current_gradient
+
+    rings = []
+    for y in range(8):
+        temp_ring = []
+        for x in range(6):
+            temp_ring.append(y + 8*x)
+        rings.append(temp_ring)
+    for color_offset in range(16):
+        for pos, ring in enumerate(rings):
+            shifted_gradient = list_shift(current_gradient, (color_offset)+pos*2)
+            for led in ring:
+                interpolated_colors = _interpolate_colors(n[led], shifted_gradient[led], 10)
+                for inter_color in interpolated_colors:
+                    n[n.n_r[led]] = inter_color
+                    n.write()
+                    time.sleep(0.005)
+            #time.sleep(0.01)
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
