@@ -3,15 +3,20 @@ import time
 import random
 from palettes import ColorDict
 
-color_dict = ColorDict.get_colordict()
-color_names = ColorDict.get_colornames()
+color_dict_obj = ColorDict()
+
+color_dict = color_dict_obj.get_colordict()
+color_names = color_dict_obj.get_colornames()
 
 pygame.init()
 screen = pygame.display.set_mode((900, 500))
 clock = pygame.time.Clock()
 running = True
 
-def interpolate_colors(start, end, steps):
+current_palette = None
+current_gradient = None
+
+def _interpolate_colors(start, end, steps):
     start_color = (start[0]/256, start[1]/256, start[2]/256)
     end_color = (end[0]/256, end[1]/256, end[2]/256)
 
@@ -32,6 +37,57 @@ def interpolate_colors(start, end, steps):
             )
         return_gradient.append(interp_color)
     return return_gradient
+
+def interpolate_colors(color_name, steps):
+    step_num = int(steps/len(color_dict[color_name]))
+    return_gradient = []
+    
+    color_values = color_dict[color_name]
+    for color_index in range(len(color_values)):
+        if color_index + 1 == len(color_values):
+            return_gradient.extend([color for color in return_gradient[::-1]])
+            return return_gradient
+        else:
+            start_color = (
+                color_values[color_index][0]/step_num,
+                color_values[color_index][1]/step_num,
+                color_values[color_index][2]/step_num
+                )
+            end_color = (
+                color_values[color_index + 1][0]/step_num,
+                color_values[color_index + 1][1]/step_num,
+                color_values[color_index + 1][2]/step_num
+                )
+
+            red_diff = end_color[0] - start_color[0]
+            green_diff = end_color[1] - start_color[1]
+            blue_diff = end_color[2] - start_color[2]
+
+            red_delta = red_diff/step_num
+            green_delta = green_diff/step_num
+            blue_delta = blue_diff/step_num
+
+            for step in range(0, step_num):
+                interp_color = (
+                    int((start_color[0] + (red_delta*step))*step_num),
+                    int((start_color[1] + (green_delta*step))*step_num),
+                    int((start_color[2] + (blue_delta*step))*step_num),
+                    )
+                return_gradient.append(interp_color)
+
+def regen_palette(palette, steps=256):
+    global current_gradient
+    global current_palette
+
+    if palette == current_palette:
+        return current_gradient
+    else:
+        current_palette = palette
+        current_gradient = interpolate_colors(current_palette, steps)
+
+def list_shift(list_obj, num):
+    num = num % len(list_obj)
+    return list_obj[num:] + list_obj[:num]
 
 def remap_leds(neo_led_obj):
     final_list = []
@@ -54,48 +110,49 @@ def remap_leds(neo_led_obj):
     return final_list
 
 class NeoPixel:
-	def __init__(self, n_leds, screen):
+    def __init__(self, n_leds, screen):
 
-		self.screen = screen
-		self.led_string = [(0,0,0) for x in range(n_leds)]
-		self.led_pos = []
+        self.screen = screen
+        self.led_string = [(0,0,0) for x in range(n_leds)]
+        self.led_pos = []
 
-		# Simulate positional reversing
-		for x in range(n_leds):
-			reverse = True
-			for column in range(6):
-				column_offset = 150*column + 50
-				if reverse:
-					positions = list(range(8))
-					positions.reverse()
-					for row in positions:
-						row_offset = 50*row + 50
-						self.led_pos.append((column_offset, row_offset))
-					reverse = False
-				else:
-					for row in range(8):
-						row_offset = 50*row + 50
-						self.led_pos.append((column_offset, row_offset))
-					reverse = True
+        # Simulate positional reversing
+        for x in range(n_leds):
+            reverse = True
+            for column in range(6):
+                column_offset = 150*column + 50
+                if reverse:
+                    positions = list(range(8))
+                    positions.reverse()
+                    for row in positions:
+                        row_offset = 50*row + 50
+                        self.led_pos.append((column_offset, row_offset))
+                    reverse = False
+                else:
+                    for row in range(8):
+                        row_offset = 50*row + 50
+                        self.led_pos.append((column_offset, row_offset))
+                    reverse = True
 
-		# Correct positional reversing
-		self.n_r = remap_leds(self)
+        # Correct positional reversing
+        self.n_r = remap_leds(self)
 
-	def __len__(self):
-		return len(self.led_string)
+    def __len__(self):
+        return len(self.led_string)
 
-	def __setitem__(self, index, value):
-		self.led_string[index] = value
+    def __setitem__(self, index, value):
+        self.led_string[index] = value
 
-	def __getitem__(self, index):
-		return self.led_string[index]
+    def __getitem__(self, index):
+        return self.led_string[index]
 
-	def write(self):
-		for led in range(len(self)):
-			pygame.draw.circle(self.screen, self.led_string[led], self.led_pos[led], 20)
-			pygame.display.flip()
+    def write(self):
+        for led in range(len(self)):
+            pygame.draw.circle(self.screen, self.led_string[led], self.led_pos[led], 20)
+            pygame.display.flip()
 
-n = NeoPixel(48, screen)
+num_pixels = 48
+n = NeoPixel(num_pixels, screen)
 
 # Establish columns
 leds = [x for x in n.n_r]
