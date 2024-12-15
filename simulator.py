@@ -286,6 +286,26 @@ def ocean_waves():
                     n.write()
 
 
+def color_chase():
+    global current_palette
+    global current_gradient
+
+    fade_pattern = []
+    fade_pattern.extend([x for x in range(1, 25)])
+    fade_pattern.extend([256 for x in range(num_pixels+25)])
+
+    shifted_palette = list_shift(current_gradient, random.randint(0, len(current_gradient)))
+    for fade in range(35, len(fade_pattern)+35):
+        shifted_fade = list_shift(fade_pattern, fade)
+        for led in n.n_r:
+            n[led] = (
+                shifted_palette[led][0]/shifted_fade[led],
+                shifted_palette[led][1]/shifted_fade[led],
+                shifted_palette[led][2]/shifted_fade[led]
+                )
+        time.sleep(0.1)
+        n.write()
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
