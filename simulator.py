@@ -340,6 +340,29 @@ def rotator():
                     n.write()
                     time.sleep(0.005)
             #time.sleep(0.01)
+
+def flame():
+    columns = []
+    for x in range(6):
+        temp_column = []
+        for y in range(8):
+            temp_column.append(y + 8*x)
+        columns.append(temp_column)
+
+    flame_gradient = _interpolate_colors((255, 247, 93), (161, 1, 0), 8)
+
+    for column in columns:
+        fill = random.randint(2, 8)
+        partial = column
+        partial.reverse()
+        partial = partial[:fill]
+        for led in column:
+            n[n.n_r[led]] = (0,0,0)
+        for pos, led in enumerate(partial):
+            n[n.n_r[led]] = flame_gradient[pos]
+        n.write()
+        time.sleep(0.025)
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
