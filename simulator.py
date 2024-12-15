@@ -165,63 +165,63 @@ for column in range(6):
 del leds
 
 def test_sequence():
-	for led in n.n_r:
-		n[led-1] = (0,0,0)
-		n[led] = (255,0,0)
-		time.sleep(0.01)
-		n.write()
+    for led in n.n_r:
+        n[led-1] = (0,0,0)
+        n[led] = (255,0,0)
+        time.sleep(0.01)
+        n.write()
 
 def test_sequence2():
-	for intensity in range(32):
-		for led in n.n_r:
-			n[led] = (intensity*8,0,0)
-			time.sleep(0.005)
-			n.write()
+    for intensity in range(32):
+        for led in n.n_r:
+            n[led] = (intensity*8,0,0)
+            time.sleep(0.005)
+            n.write()
 
 def color_rain():
-	rain_gradient_map = [
-		[1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-		[0.9, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-		[0.5, 0.9, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-		[0.2, 0.5, 0.9, 1.0, 0.0, 0.0, 0.0, 0.0],
-		[0.1, 0.2, 0.5, 0.9, 1.0, 0.0, 0.0, 0.0],
-		[0.05, 0.1, 0.2, 0.5, 0.9, 1.0, 0.0, 0.0],
-		[0.01, 0.05, 0.1, 0.2, 0.5, 0.9, 1.0, 0.0],
-		[0.0, 0.01, 0.05, 0.1, 0.2, 0.5, 0.9, 1.0],
-		[0.0, 0.0, 0.01, 0.05, 0.1, 0.2, 0.5, 0.9],
-		[0.0, 0.0, 0.0, 0.01, 0.05, 0.1, 0.2, 0.5],
-		[0.0, 0.0, 0.0, 0.0, 0.01, 0.05, 0.1, 0.2],
-		[0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.05, 0.1],
-		[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.05],
-		[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01],
-		[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-	]
+    rain_gradient_map = [
+        [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        [0.9, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        [0.5, 0.9, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        [0.2, 0.5, 0.9, 1.0, 0.0, 0.0, 0.0, 0.0],
+        [0.1, 0.2, 0.5, 0.9, 1.0, 0.0, 0.0, 0.0],
+        [0.05, 0.1, 0.2, 0.5, 0.9, 1.0, 0.0, 0.0],
+        [0.01, 0.05, 0.1, 0.2, 0.5, 0.9, 1.0, 0.0],
+        [0.0, 0.01, 0.05, 0.1, 0.2, 0.5, 0.9, 1.0],
+        [0.0, 0.0, 0.01, 0.05, 0.1, 0.2, 0.5, 0.9],
+        [0.0, 0.0, 0.0, 0.01, 0.05, 0.1, 0.2, 0.5],
+        [0.0, 0.0, 0.0, 0.0, 0.01, 0.05, 0.1, 0.2],
+        [0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.05, 0.1],
+        [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.05],
+        [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01],
+        [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    ]
 
-	rand_col = random.randint(0, 5)
-	leds = n.n_r[int(rand_col * 8):int((rand_col * 8)+8)]
-	print(f"Col: {rand_col} - LEDs: {leds}")
-	rand_color = cool_colors1[random.randint(0, len(cool_colors1)-1)]
+    rand_col = random.randint(0, 5)
+    leds = n.n_r[int(rand_col * 8):int((rand_col * 8)+8)]
+    print(f"Col: {rand_col} - LEDs: {leds}")
+    rand_color = cool_colors1[random.randint(0, len(cool_colors1)-1)]
 
-	# Compute gradient mapping
-	gradient_values = []
+    # Compute gradient mapping
+    gradient_values = []
 
-	for gradient in rain_gradient_map:
-		gradient_step = []
-		for led_mult in gradient:
-			led_values =(
-				int(rand_color[0]*led_mult),
-				int(rand_color[1]*led_mult),
-				int(rand_color[2]*led_mult))
-			gradient_step.append(led_values)
+    for gradient in rain_gradient_map:
+        gradient_step = []
+        for led_mult in gradient:
+            led_values =(
+                int(rand_color[0]*led_mult),
+                int(rand_color[1]*led_mult),
+                int(rand_color[2]*led_mult))
+            gradient_step.append(led_values)
 
-		gradient_values.append(gradient_step)
+        gradient_values.append(gradient_step)
 
-	for step in gradient_values:
-		for pos, led in enumerate(leds):
-			n[led] = step[pos]
-		n.write()
-		time.sleep(0.01)
-	time.sleep(random.randrange(0, 100)/100)
+    for step in gradient_values:
+        for pos, led in enumerate(leds):
+            n[led] = step[pos]
+        n.write()
+        time.sleep(0.01)
+    time.sleep(random.randrange(0, 100)/100)
 
 def sweeping_colors():
     
@@ -253,53 +253,53 @@ def sweeping_colors():
             time.sleep(0.0001)
     
 def ocean_waves():
-
-	color_fwd= interpolate_colors(color_dict['ocean'][0], color_dict['ocean'][1], 16)
-	color_rev = interpolate_colors(color_dict['ocean'][1], color_dict['ocean'][0], 16)
-	color = []
-	for step in range(2):
-			color.extend(color_fwd)
-			color.extend(color_rev)
-
-	color.extend(color_rev)
-	colorpos = 0
-	reset = False
-	for _ in range(8):
-		for iterator in range(8):
-			if not reset:
-				colorpos += 1
-			else:
-				colorpos -= 1
+    color = []
+    color.extend(current_gradient)
+    colorpos = 0
+    reset = False
+    for _ in range(8):
+        for iterator in range(8):
+            if not reset:
+                colorpos += 1
+            else:
+                colorpos -= 1
 
 
-			if colorpos == 0:
-				reset = False
-			elif colorpos == 64:
-				reset = False
+            if colorpos == 0:
+                reset = False
+            elif colorpos == 64:
+                reset = False
 
-			for column in led_columns:
-				for pos, led in enumerate(column[::iterator+2]):
-					n[led] = (
-						color[colorpos][0],
-						color[colorpos][1],
-						color[colorpos][2])
-					n.write()
-			for column in led_columns:
-				for pos, led in enumerate(column[1::iterator+2]):
-					n[led] = (
-						color[colorpos][0],
-						color[colorpos][1],
-						color[colorpos][2])
-					n.write()
+            for column in led_columns:
+                for pos, led in enumerate(column[::iterator+2]):
+                    n[led] = (
+                        color[colorpos][0],
+                        color[colorpos][1],
+                        color[colorpos][2])
+                    n.write()
+            for column in led_columns:
+                for pos, led in enumerate(column[1::iterator+2]):
+                    n[led] = (
+                        color[colorpos][0],
+                        color[colorpos][1],
+                        color[colorpos][2])
+                    n.write()
 
 
 while running:
-	for event in pygame.event.get():
-		if event.type == pygame.QUIT:
-			running = False
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
 
-	ocean_waves()
+    regen_palette(color_names[random.randrange(0, len(color_names))], 512)
+    print(current_palette)
 
-	clock.tick(60)
+    while True:
+        try:
+            flame()
+        except KeyboardInterrupt:
+            quit()
+
+    clock.tick(60)
 
 pygame.quit()
