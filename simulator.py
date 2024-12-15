@@ -306,6 +306,19 @@ def color_chase():
         time.sleep(0.1)
         n.write()
 
+def cycle():
+    global current_palette
+    global current_gradient
+    
+    pixel_list = list(range(num_pixels))
+
+    for j in range(len(current_gradient)):
+        shifted_palette = list_shift(current_gradient, j)
+        for i in pixel_list:
+            n[i] = shifted_palette[i]
+        n.write()
+        time.sleep(0.01)
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
