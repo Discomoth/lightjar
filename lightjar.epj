@@ -2,7 +2,7 @@
   "header": {
     "comment": "eric project file for project lightjar",
     "copyright": "Copyright (C) 2024 , ",
-    "saved": "2024-12-02, 21:00:25"
+    "saved": "2024-12-21, 00:39:41"
   },
   "project": {
     "AUTHOR": "",
@@ -74,6 +74,8 @@
     "SOURCES": [
       "__init__.py",
       "main.py",
+      "output.py",
+      "palette_generator.py",
       "palettes.py",
       "simulator.py"
     ],
