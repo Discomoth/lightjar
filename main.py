@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # main.py
 import neopixel
-from machine import Pin, ADC, Timer
+from machine import Pin, ADC, Timer, WDT
 import random
 import time
 from palettes import ColorDict
@@ -23,14 +23,29 @@ led_count = 48
 
 # Misc globals
 time_delay = 0.001
+global_current_gradient = None
+global_mode_changed_flag = None
 global_current_palette = "magenta-blue"
 global_current_palette_index = 0
-global_current_gradient = None
-global_brightness_factor= 0.5
+global_brightness_factor = 0.1
 global_brightness_mode = 'manual'
+global_mode_value_index = 0
 global_mode_value = None
-global_mode_value_index = 4
-global_mode_changed_flag = 0
+global_save_flag = 0
+
+devmode = False
+
+class FakeWDT:
+    @staticmethod
+    def feed():
+        pass
+
+# Setup hardware watchdog
+watchdog_timer_value = 8000
+if devmode:
+    global_wdt = FakeWDT()
+else:
+    global_wdt = WDT(timeout=watchdog_timer_value)
 
 class ProgramControl:
 
@@ -43,31 +58,54 @@ class ProgramControl:
         global global_mode_value_index
 
         try:
-            with open('config.json', 'r') as file:
-                self.config_dict = json.load(file)
-                global_current_palette = self.config_dict['global_brightness_mode']
-                global_mode_value_index = self.config_dict['global_mode_value_index']
+            self.load_config('config.json')
+            #with open('config.json', 'r') as file:
+            #    self.config_dict = json.load(file)
+            #    global_current_palette = self.config_dict['global_brightness_mode']
+            #    global_mode_value_index = self.config_dict['global_mode_value_index']
 
         except OSError:
+            
             self.config_dict = {
-            'global_current_palette_index':global_current_palette_index,
-            'global_current_palette':global_current_palette,
-            'global_brightness_factor':global_brightness_factor,
-            'global_brightness_mode':global_brightness_mode,
-            'global_mode_value_index':global_mode_value_index
+            'global_current_palette_index':1,
+            'global_current_palette':"magenta-blue",
+            'global_brightness_factor':0.1,
+            'global_brightness_mode':'manual',
+            'global_mode_value_index':0
             }
+            
+            self.save_config('config.json')
+            self.load_config('config.json')
 
+        self.palette_control = PaletteControl()
         self.led_control = LEDControl(neopixel_pin, led_count)
         self.brightness_control = BrightnessControl(brightness_sensor_pin, brightness_control_pin, global_brightness_mode)
         self.mode_control = ModeControl(self.led_control, global_mode_value_index)
-        self.palette_control = PaletteControl()
 
         self.button_control = ButtonControl(push_button_pin, self.mode_control, self.palette_control, self.brightness_control)
+        
+        self.check_timer = Timer()
+        self.check_timer.init(period=250, callback=self.check_save)
+
+    def check_save(self, t=None):
+        if global_save_flag == 1:
+            self.save_config('config.json')
 
     def save_config(self, config_file):
+        global global_save_flag
+        global watchdog_timer_value
+        global global_mode_changed_flag
+        
+        self.refresh_config_dict()
+        
         with open(config_file, 'w') as file:
             json.dump(self.config_dict, file)
             print('config file saved!')
+        global_save_flag = 0
+
+        if global_mode_changed_flag == 1:
+            WDT(timeout = 10)
+            time.sleep(0.5)
 
     def load_config(self, config_file):
         global global_current_palette
@@ -94,13 +132,34 @@ class ProgramControl:
         }
 
     def run(self):
+        global global_save_flag
         global global_mode_value
         global global_mode_changed_flag
+        global watchdog_timer_value
+        global global_mode_value_index
+        
+        self.load_config('config.json')
+        
         while True:
             try:
-                while global_mode_changed_flag == 0:
-                    self.mode_control.current_mode_value()
-                global_mode_changed_flag = 0
+                while True:
+                    if global_save_flag == 1:
+                        self.save_config('config.json')
+                        global_save_flag = 0
+                    if global_mode_value_index == 0:
+                        self.mode_control.cycle()
+                    elif global_mode_value_index == 1:
+                        self.mode_control.sweeping_colors()
+                    elif global_mode_value_index == 2:
+                        self.mode_control.rotator()
+                    elif global_mode_value_index == 3:
+                        self.mode_control.ocean_waves()
+                    elif global_mode_value_index == 4:
+                        self.mode_control.flame()
+                    elif global_mode_value_index == 5:
+                        self.mode_control.test_sequence1()
+                    elif global_mode_value_index == 6:
+                        self.mode_control.test_sequence2()
             except Exception as e:
                 raise(e)
 
@@ -119,7 +178,13 @@ class LEDControl:
         self.n_r = self.remap_leds()
 
     def write(self):
+        global global_wdt
         global global_brightness_factor
+        global global_mode_changed_flag
+        global watchdog_timer_value
+        
+        global_wdt.feed()
+        
         initial_sequence = [x for x in self.n]
         for index, color_value in enumerate(self.n):
             self.n[index] = (
@@ -163,7 +228,7 @@ class BrightnessControl:
         self.last_sensor_value = self._measure_sensor()
         self.last_input_value = self._measure_input()
 
-        self.mode = brightness_mode
+        self.mode = global_brightness_mode
         
         # Hardware timer interrupt to check brightness
         self.check_timer = Timer()
@@ -173,10 +238,31 @@ class BrightnessControl:
         pass
 
     def _measure_sensor(self):
-        return self.sensor.read_u16() / 65535
+        value = self.sensor.read_u16() / 65535
+        if value > 1: 
+            return 1
+        elif value < 0:
+            return 0
+        else:
+            return value
+        
+    def _measure_sensor_inv(self):
+        value =  0.5 - (self.sensor.read_u16()/65535)
+        if value > 1: 
+            return 1
+        elif value < 0:
+            return 0
+        else:
+            return value
 
     def _measure_input(self):
-        return self.input.read_u16() / 65535
+        value = self.input.read_u16() / 65535
+        if value > 1: 
+            return 1
+        elif value < 0:
+            return 0
+        else:
+            return value
 
     def read_brightness(self, t=None):
         global global_brightness_factor
@@ -186,14 +272,19 @@ class BrightnessControl:
         elif self.mode == 'automatic':
             raw_value = self._measure_sensor()
             global_brightness_factor = raw_value
+        elif self.mode == 'automatic_inv':
+            raw_value = self._measure_sensor_inv()
+            global_brightness_factor = raw_value
 
     def toggle_automatic_brightness(self):
         global global_brightness_mode
 
-        if self.mode == 'automatic':
-            self.mode = 'manual'
-        elif self.mode == 'manual':
+        if self.mode == 'manual':
             self.mode = 'automatic'
+        elif self.mode == 'automatic':
+            self.mode = 'automatic_inv'
+        elif self.mode == 'automatic_inv':
+            self.mode = 'manual'
 
         global_brightness_mode = self.mode
 
@@ -217,21 +308,32 @@ class ButtonControl:
 
     def button_irq_handler(self, t=None):
         global global_current_palette
+        global global_save_flag
+        global program_control
+
         start_time = time.ticks_ms()
         while self.button.value() == 0:
             pass
         time_delta = time.ticks_diff(time.ticks_ms(), start_time)
 
+        #For now I have removed the mode change functionality.
+        # Perhaps in a future version of firmware they will be enabled
+        # but as they stand now, the switching mechanism is a little jank
+        # and the modes themselves are not all that imperssive...
+
         if 50 < time_delta < 1000:
             print('color change')
             self.palette_control.next_palette()
             print(f'new_palette: {global_current_palette}')
-        elif 750 < time_delta < 2000:
-            print('mode change')
-            self.mode_control.next_mode()
-        elif 2000 < time_delta:
+            program_control.save_config('config.json')
+        #elif 750 < time_delta < 2000:
+        #    print('mode change')
+        #    self.mode_control.next_mode()
+        #    program_control.save_config('config.json')
+        elif 1000 < time_delta:
             print('brightness mode change')
             self.brightness_control.toggle_automatic_brightness()
+            program_control.save_config('config.json')
         else:
             pass
 
@@ -239,6 +341,7 @@ class ModeControl:
 
     def __init__(self, neopixel_obj, initial_mode_index=0):
         global global_mode_value
+        global global_mode_value_index
 
         self.modes = [
             self.sweeping_colors,
@@ -246,7 +349,9 @@ class ModeControl:
             self.color_chase,
             self.cycle,
             self.rotator,
-            self.flame
+            self.flame,
+            self.test_sequence1,
+            self.test_sequence2
         ]
 
         # Set global mode on instantiation
@@ -257,12 +362,10 @@ class ModeControl:
 
     def next_mode(self):
         global global_mode_value_index
-        global global_mode_value
         global global_mode_changed_flag
         global_mode_value_index += 1
-        if global_mode_value_index >= len(self.modes):
+        if global_mode_value_index >= len(self.modes)-1:
             global_mode_value_index = 0
-        global_mode_value = self.modes[global_mode_value_index]
         global_mode_changed_flag = 1
 
     @staticmethod
@@ -275,7 +378,7 @@ class ModeControl:
             self.neopixel.n[index] = (0,0,0)
         self.neopixel.write()
 
-    def test_sequence(self):
+    def test_sequence1(self):
         for led in self.neopixel.n_r:
             self.neopixel.n[led-1] = (0,0,0)
             self.neopixel.n[led] = (255,0,0)
@@ -437,6 +540,7 @@ class PaletteControl:
 
     def __init__(self):
         global global_current_palette_index
+        
         self.color_dict = ColorDict()
         self.palette_names = self.color_dict.get_colornames()
         self.palette_dict = self.color_dict.get_colordict()
@@ -445,11 +549,9 @@ class PaletteControl:
     def regen_palette(self, palette, steps=256):
         global global_current_palette
         global global_current_gradient
-        if palette == global_current_palette:
-            return global_current_gradient
-        else:
-            global_current_palette = palette
-            global_current_gradient = self.interpolation_multipoint(global_current_palette, steps)
+
+        global_current_palette = palette
+        global_current_gradient = self.interpolation_multipoint(global_current_palette, steps)
 
     def next_palette(self):
         global global_current_palette_index
