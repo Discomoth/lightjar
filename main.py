@@ -173,9 +173,15 @@ class LEDControl:
         self.indicator = Pin(self.indicator_pin)
         self.indicator_state = indicator_state
         self.n_scaled = [(0,0,0) for x in range(len(self.n))]
+        
+        self.indicator_led_timer = Timer()
+        self.indicator_led_timer.init(mode=Timer.PERIODIC, period=500, callback=self.indicator_toggle)
 
         # Remap leds for correct sequencing
         self.n_r = self.remap_leds()
+
+    def indicator_toggle(self, t=None):
+        self.indicator.toggle()
 
     def write(self):
         global global_wdt
