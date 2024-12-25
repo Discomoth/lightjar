@@ -558,7 +558,7 @@ class PaletteControl:
         global global_current_palette
         
         global_current_palette_index += 1
-        if global_current_palette_index > len(self.palette_names):
+        if global_current_palette_index > len(self.palette_names)-1:
             global_current_palette_index = 0
         self.regen_palette(self.palette_names[global_current_palette_index], 64)
 
