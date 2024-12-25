@@ -10,7 +10,7 @@ You will need:
 
 First download the files from github. This can be done by clicking on the `compiled_fw` folder, then the `firmware.uf2` file, then select 'View raw'. The file should download. If it does not, you can click the little download icon to the left above the 'View raw' text.
 
-# To update the light jar microcontroller
+## To update the light jar microcontroller
 
 Disconnect the power and take the light jar apart and slide the top cap free of the helical light structure. A green microcontroller board with a small raspberry logo should be visible. On the top of this green board, a small white button near a micro-USB socket will be at the 'bottom' of it. 
 
