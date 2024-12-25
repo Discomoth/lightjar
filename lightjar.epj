@@ -2,7 +2,7 @@
   "header": {
     "comment": "eric project file for project lightjar",
     "copyright": "Copyright (C) 2024 , ",
-    "saved": "2024-12-21, 00:39:41"
+    "saved": "2024-12-24, 18:15:59"
   },
   "project": {
     "AUTHOR": "",
@@ -57,6 +57,7 @@
     "MIXEDLANGUAGE": false,
     "OTHERS": [
       ".gitignore",
+      "README.md",
       "lightjar.epj"
     ],
     "OTHERTOOLSPARMS": {},
