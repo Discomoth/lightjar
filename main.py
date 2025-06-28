@@ -235,26 +235,26 @@ class BrightnessControl:
         self.last_input_value = self._measure_input()
 
         self.mode = global_brightness_mode
-        
+
         # Hardware timer interrupt to check brightness
         self.check_timer = Timer()
         self.check_timer.init(period=100, callback=self.read_brightness)
-    
+
     def _pass(self):
         pass
 
     def _measure_sensor(self):
         value = self.sensor.read_u16() / 65535
-        if value > 1: 
+        if value > 1:
             return 1
         elif value < 0:
             return 0
         else:
             return value
-        
+
     def _measure_sensor_inv(self):
         value =  0.5 - (self.sensor.read_u16()/65535)
-        if value > 1: 
+        if value > 1:
             return 1
         elif value < 0:
             return 0
@@ -263,7 +263,7 @@ class BrightnessControl:
 
     def _measure_input(self):
         value = self.input.read_u16() / 65535
-        if value > 1: 
+        if value > 1:
             return 1
         elif value < 0:
             return 0
@@ -276,10 +276,10 @@ class BrightnessControl:
             raw_value = self._measure_input()
             global_brightness_factor = raw_value
         elif self.mode == 'automatic':
-            raw_value = self._measure_sensor()
+            raw_value = self._measure_sensor() * self._measure_input()
             global_brightness_factor = raw_value
         elif self.mode == 'automatic_inv':
-            raw_value = self._measure_sensor_inv()
+            raw_value = self._measure_sensor_inv() * self._measure_input()
             global_brightness_factor = raw_value
 
     def toggle_automatic_brightness(self):
