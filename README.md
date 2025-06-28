@@ -25,14 +25,12 @@ Get things setup and ready
 ```
 sudo apt install git gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential cmake
 
-git clone git@github.com:micropython/micropython.git
+git clone git@github.com:micropython/micropython.git --recurse-submodules
 
 cd micropython/mpy-cross
 make
 
 cd ../
-
-git submodule update --init lib/pico-sdk lib/tinyusb
 ```
 Then copy the necessary files into the `ports/rp2/modules` directory. 
 
@@ -49,4 +47,6 @@ cd ports/rp2
 
 make
 ```
+
+To make the debug build, just change the `devmode` variable to `True` to disable the watchdog timer.
 The output files should be within the `ports/rp2/build-PICO` directory.
