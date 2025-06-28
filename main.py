@@ -276,10 +276,10 @@ class BrightnessControl:
             raw_value = self._measure_input()
             global_brightness_factor = raw_value
         elif self.mode == 'automatic':
-            raw_value = self._measure_sensor() * self._measure_input()
+            raw_value = self._measure_sensor()
             global_brightness_factor = raw_value
         elif self.mode == 'automatic_inv':
-            raw_value = self._measure_sensor_inv() * self._measure_input()
+            raw_value = self._measure_sensor_inv()
             global_brightness_factor = raw_value
 
     def toggle_automatic_brightness(self):
